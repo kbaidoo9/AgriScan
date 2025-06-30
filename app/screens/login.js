@@ -8,8 +8,8 @@ import {
   Dimensions,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import CustomInput from "../../components/CustomInput";
-import CustomButton from "../../components/CustomButton";
+import CustomInput from "../components/CustomInput";
+import CustomButton from "../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 
 const { height } = Dimensions.get("window");
@@ -17,7 +17,7 @@ const { height } = Dimensions.get("window");
 const LogIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const [errors, setErrors] = useState({});
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,42 +28,36 @@ const LogIn = () => {
   };
 
   const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email.trim());
-  };
-
-  const validatePassword = (password) => {
-    return password.length >= 8;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const validateForm = () => {
     let valid = true;
+    let newErrors = {};
 
     if (!validateEmail(email)) {
-      setEmailError("Please enter a valid email address");
+      newErrors.email = "Please enter a valid email address";
       valid = false;
-    } else {
-      setEmailError("");
     }
 
-    if (!validatePassword(password)) {
+    if (password.length < 8) {
       setPasswordError("Password must be at least 8 characters long");
       valid = false;
     } else {
       setPasswordError("");
     }
 
+    setErrors(newErrors);
     return valid;
   };
 
   const mockSignIn = async () => {
     if (validateForm()) {
-      setLoading(true); 
+      setLoading(true);
       try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        console.log("Login successful for:", email);
-        navigation.navigate("BottomTabNavigator");
+        console.log("Login successful for email:", email);
+        navigation.navigate("Home");
       } catch (error) {
         Alert.alert("Error", "Something went wrong during login.");
       } finally {
@@ -77,7 +71,7 @@ const LogIn = () => {
   };
 
   const signUpPressed = () => {
-    navigation.navigate("SignUp");
+    navigation.navigate("signup");
   };
 
   return (
@@ -86,17 +80,23 @@ const LogIn = () => {
         <Text style={styles.title}>Log into your account</Text>
 
         <CustomInput
-          placeholder="Email"
+          placeholder="Enter Email"
           value={email}
           onChangeText={(text) => {
             setEmail(text);
-            if (emailError) setEmailError(""); 
+            if (errors.email) {
+              setErrors((prev) => ({ ...prev, email: "" }));
+            }
           }}
-          bordercolor={emailError ? "red" : "#ccc"}
+          keyboardType="email-address"
+          bordercolor={errors.email ? "red" : "#ccc"}
           borderRadius={15}
           iconName="mail"
+          style={styles.emailInput}
         />
-        {emailError && <Text style={styles.errorText}>{emailError}</Text>}
+        {errors.email && (
+          <Text style={styles.errorText}>{errors.email}</Text>
+        )}
 
         <View style={styles.passwordContainer}>
           <CustomInput
@@ -104,7 +104,7 @@ const LogIn = () => {
             value={password}
             onChangeText={(text) => {
               setPassword(text);
-              if (passwordError) setPasswordError(""); 
+              if (passwordError) setPasswordError("");
             }}
             secureTextEntry={!showPassword}
             bordercolor={passwordError ? "red" : "#ccc"}
@@ -130,7 +130,7 @@ const LogIn = () => {
         <View style={styles.bottomSection}>
           <CustomButton
             onPress={mockSignIn}
-            bg="#F76F6F"
+            bg="green"
             txt="white"
             style={styles.button}
             text={loading ? "Processing..." : "Next"}
@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
   },
   passwordContainer: {
     position: "relative",
+    width: "100%",
   },
   eyeIcon: {
     position: "absolute",
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     top: 15,
   },
   link: {
-    color: "#FB3333",
+    color: "green",
     alignSelf: "flex-end",
     marginBottom: 20,
   },

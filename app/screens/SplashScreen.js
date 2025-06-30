@@ -13,7 +13,7 @@ const SplashScreen = ({ navigation }) => {
     }).start();
 
     const timeout = setTimeout(() => {
-      navigation.replace('Home'); // Navigates to Home and removes Splash from stack
+      navigation.replace('signup'); // Navigates to Home and removes Splash from stack
     }, 2000); // Show splash screen for 2 seconds
 
     return () => clearTimeout(timeout);
