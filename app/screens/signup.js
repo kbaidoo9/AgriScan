@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 8,
     marginBottom: 5,
   },
   passwordInputContainer: {
