@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Image, Animated, StyleSheet, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as SecureStore from 'expo-secure-store';
 
 const SplashScreen = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -12,18 +13,30 @@ const SplashScreen = ({ navigation }) => {
       useNativeDriver: true,
     }).start();
 
-    const timeout = setTimeout(() => {
-      navigation.replace('signup'); // Navigates to Home and removes Splash from stack
-    }, 2000); // Show splash screen for 2 seconds
+    const checkUser = async () => {
+      try {
+        const storedUser = await SecureStore.getItemAsync('user_data');
+        setTimeout(() => {
+          if (storedUser) {
+            navigation.replace('Home');
+          } else {
+            navigation.replace('login');
+          }
+        }, 2000);
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+        navigation.replace('login');
+      }
+    };
 
-    return () => clearTimeout(timeout);
+    checkUser();
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View style={[styles.logoContainer, { opacity: fadeAnim }]}>
         <Image
-          source={require('../assets/agriscan.png')} 
+          source={require('../assets/agriscan.png')}
           style={styles.logo}
           resizeMode="contain"
         />

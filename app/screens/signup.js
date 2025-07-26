@@ -13,9 +13,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
-
-
-const BASE_URL = "https://your-api-url.com";
+import { BASE_URL } from "../utils/config";
+import { useUser } from "../context/UserContext";
 
 const signup = () => {
   const [email, setEmail] = useState("");
@@ -24,6 +23,7 @@ const signup = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const { updateUser } = useUser();
 
   const toggleVisibility = () => {
     setShowPassword(!showPassword);
@@ -42,8 +42,8 @@ const signup = () => {
       valid = false;
     }
 
-    if (!password || password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
+    if (!password || password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
       valid = false;
     }
 
@@ -61,8 +61,7 @@ const signup = () => {
       };
 
       try {
-        console.log("Sending request:", data);
-        const url = `${BASE_URL}/auth/register`;
+        const url = `${BASE_URL}auth/register`;
 
         const response = await fetch(url, {
           method: "POST",
@@ -75,11 +74,12 @@ const signup = () => {
         if (response.ok) {
           const responseData = await response.json();
           console.log("Response:", responseData);
-          navigation.navigate("Verification", { email });
+          updateUser(responseData.data)
+          navigation.navigate("Home");
         } else {
           const errorData = await response.json();
           console.error("Error response:", errorData);
-          Alert.alert("Error", errorData?.message || "Something went wrong.");
+          Alert.alert("Error", errorData?.msg || "Something went wrong.");
         }
       } catch (error) {
         console.error("Error:", error);
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 8,
     marginBottom: 5,
   },
   passwordInputContainer: {

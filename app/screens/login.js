@@ -11,6 +11,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import { BASE_URL } from "../utils/config";
+import { useUser } from "../context/UserContext";
 
 const { height } = Dimensions.get("window");
 
@@ -22,6 +24,7 @@ const LogIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+    const { updateUser } = useUser();
 
   const toggleVisibility = () => {
     setShowPassword(!showPassword);
@@ -54,15 +57,37 @@ const LogIn = () => {
   const mockSignIn = async () => {
     if (validateForm()) {
       setLoading(true);
+      const data = {
+        email,
+        password,
+      };
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log("Login successful for email:", email);
-        navigation.navigate("Home");
-      } catch (error) {
-        Alert.alert("Error", "Something went wrong during login.");
-      } finally {
-        setLoading(false);
-      }
+              const url = `${BASE_URL}auth/authenticate`;
+      
+              const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+              });
+      
+              if (response.ok) {
+                const responseData = await response.json();
+                console.log("Response:", responseData);
+                updateUser(responseData.data)
+                navigation.navigate("Home");
+              } else {
+                const errorData = await response.json();
+                console.error("Error response:", errorData);
+                Alert.alert("Error", errorData?.msg || "Something went wrong.");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              Alert.alert("Error", "Something went wrong. Please try again.");
+            } finally {
+              setLoading(false);
+            }
     }
   };
 

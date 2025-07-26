@@ -6,11 +6,13 @@ import  SplashScreen from "../app/screens/SplashScreen";
 import Home from "../app/screens/Home";
 import login from "../app/screens/login";
 import signup from "../app/screens/signup";
+import { UserProvider } from "../app/context/UserContext";
 
 const Stack = createNativeStackNavigator();
 
 const MainStackNavigator = () => {
   return (
+    <UserProvider>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splashscreen" component={SplashScreen} />
@@ -20,6 +22,7 @@ const MainStackNavigator = () => {
 
           </Stack.Navigator>
         </NavigationContainer>
+        </UserProvider>
   );
 };
 

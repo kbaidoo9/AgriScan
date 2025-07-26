@@ -49,7 +49,7 @@ const takePicture = async () => {
       <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
   {/* Other components... */}
 
-  {/* ✅ Focus Scanner Brackets */}
+  
   {status === 'idle' && (
         <View style={styles.overlay}>
           <View style={styles.focusScanner}>
@@ -62,7 +62,7 @@ const takePicture = async () => {
   )}
 
 
-  {/* 📷 Captured Preview / Processing / Completed */}
+ 
   {status === 'preview' && capturedPhoto && (
     <BlurView intensity={50} style={styles.overlay}>
       <Image source={{ uri: capturedPhoto }} style={styles.previewImage} />
