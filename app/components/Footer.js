@@ -12,6 +12,7 @@ const Footer = () => {
             <Text style={styles.zoomText}>1x</Text>
           </View>
         </View> 
+        
   )
 }
 

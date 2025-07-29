@@ -3,6 +3,10 @@ import { useRef, useState } from 'react';
 import { Button, Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { Menu, Divider } from 'react-native-paper';
+import { useUser } from '../context/UserContext';
+import { useNavigation } from '@react-navigation/native';
+
 
 export default function App() {
   const [facing, setFacing] = useState('back');
@@ -10,6 +14,20 @@ export default function App() {
   const cameraRef = useRef(null);
 const [capturedPhoto, setCapturedPhoto] = useState(null);
 const [status, setStatus] = useState('idle');
+const [menuVisible, setMenuVisible] = useState(false);
+const menuAnchorRef = useRef(null);
+const { clearUser } = useUser()
+const openMenu = () => setMenuVisible(true);
+const closeMenu = () => setMenuVisible(false);
+  const navigation = useNavigation();
+
+const handleLogout = () => {
+  closeMenu();
+  alert("Logged out");
+  clearUser();
+  navigation.navigate("login")
+};
+
 
 const takePicture = async () => {
     if (cameraRef.current) {
@@ -48,6 +66,20 @@ const takePicture = async () => {
     <View style={styles.container}>
       <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
   {/* Other components... */}
+  <View style={styles.menuContainer} ref={menuAnchorRef}>
+  <Menu
+    visible={menuVisible}
+    onDismiss={closeMenu}
+    anchor={
+      <TouchableOpacity onPress={openMenu} style={styles.ellipsisIcon}>
+        <Ionicons name="ellipsis-vertical" size={24} color="white" />
+      </TouchableOpacity>
+    }
+  >
+    <Menu.Item onPress={handleLogout} title="Logout" leadingIcon="logout" />
+  </Menu>
+</View>
+
 
   
   {status === 'idle' && (
@@ -264,4 +296,19 @@ scanButtonWrapper: {
     fontSize: 16,
     color: '#555',
   },
+  menuContainer: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 99,
+  },
+  
+  ellipsisIcon: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    padding: 8,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
 });
